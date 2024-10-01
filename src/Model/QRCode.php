@@ -33,7 +33,25 @@ class QRCode extends DataObject
 
     private static $db = [
         'Title' => 'Varchar',
-        'ExternalLink' => 'Varchar'
+        'ExternalLink' => 'Varchar',
+        'ExternalLink' => 'Varchar',
+        'UTMID' => 'Varchar',
+        'UTMSource' => 'Varchar',
+        'UTMMedium' => 'Varchar',
+        'UTMCampaign' => 'Varchar',
+        'UTMSourcePlatform' => 'Varchar',
+        'UTMTerm' => 'Varchar',
+        'UTMContent' => 'Varchar',
+    ];
+
+    private static $param_map = [
+        'UTMID' => 'utm_id',
+        'UTMSource' => 'utm_source',
+        'UTMMedium' => 'utm_medium',
+        'UTMCampaign' => 'utm_campaign',
+        'UTMSourcePlatform' => 'utm_source_platform',
+        'UTMTerm' => 'utm_term',
+        'UTMContent' => 'utm_content',
     ];
 
     private static $has_one = [
@@ -49,7 +67,14 @@ class QRCode extends DataObject
             'Root.Main',
             [
                 TreeDropdownField::create('InternalLinkID', _t(__CLASS__ . '.InternalLink', 'Internal link'), SiteTree::class),
-                TextField::create('ExternalLink', _t(__CLASS__ . '.ExternalLink', 'External link'))
+                TextField::create('ExternalLink', _t(__CLASS__ . '.ExternalLink', 'External link')),
+                TextField::create('UTMID', _t(__CLASS__ . '.UTMID', 'UTM ID'))->setDescription('Campaign ID. Used to identify a specific campaign or promotion. This is a required key for GA4 data import. Use the same IDs that you use when uploading campaign cost data.'),
+                TextField::create('UTMSource', _t(__CLASS__ . '.UTMSource', 'UTM source'))->setDescription('Referrer, for example: google, newsletter4, billboard'),
+                TextField::create('UTMMedium', _t(__CLASS__ . '.UTMMedium', 'UTM medium'))->setDescription('Marketing medium, for example: cpc, banner, email'),
+                TextField::create('UTMCampaign', _t(__CLASS__ . '.UTMCampaign', 'UTM campaign'))->setDescription('Product, slogan, promo code, for example: spring_sale'),
+                TextField::create('UTMSourcePlatform', _t(__CLASS__ . '.UTMSourcePlatform', 'UTM source platform'))->setDescription('The platform responsible for directing traffic to a given Analytics property (such as a buying platform that sets budgets and targeting criteria or a platform that manages organic traffic data). For example: Search Ads 360 or Display & Video 360.'),
+                TextField::create('UTMTerm', _t(__CLASS__ . '.UTMTerm', 'UTM term'))->setDescription('Paid keyword'),
+                TextField::create('UTMContent', _t(__CLASS__ . '.UTMContent', 'UTM content'))->setDescription('Use to differentiate creatives. For example, if you have two call-to-action links within the same email message, you can use utm_content and set different values for each so you can tell which version is more effective.'),
             ]
         );
 
@@ -68,12 +93,27 @@ class QRCode extends DataObject
 
     public function getQRLink()
     {
-        return Controller::join_links(Director::absoluteBaseURL(),'qr/' . $this->ID);
+        return Controller::join_links(Director::absoluteBaseURL(), 'qr/' . $this->ID);
     }
 
     public function getLink()
     {
-        return $this->InternalLinkID ? $this->InternalLink()->AbsoluteLink() : $this->ExternalLink;
+        $link = $this->InternalLinkID ? $this->InternalLink()->AbsoluteLink() : $this->ExternalLink;
+
+        // Build query parameters from UTM fields
+        $params = [
+            'qr_referrer=' . $this->ID,
+        ];
+        // Get the database fields that begin with UTM and add them to the query string
+        $fields = $this->config()->get('param_map');
+        foreach ($fields as $field => $param) {
+            if ($this->$field) {
+                $params[] = $param . '=' . urlencode($this->$field);
+            }
+        }
+        $paramsString = '?' . implode('&', $params);
+
+        return Controller::join_links($link, $paramsString);
     }
 
     public function getFileName()
@@ -124,7 +164,6 @@ class QRCode extends DataObject
         fclose($fp);
         unlink($tmp);
         exit;
-
     }
 
     /**
@@ -202,7 +241,6 @@ class QRCode extends DataObject
 
             return (new \chillerlan\QRCode\QRCode($options))->render($this->getQRLink(), $file);
         }
-
     }
 
     public function onBeforeWrite()
@@ -215,5 +253,4 @@ class QRCode extends DataObject
             }
         }
     }
-
 }
