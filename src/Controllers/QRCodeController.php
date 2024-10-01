@@ -21,10 +21,9 @@ class QRCodeController extends Controller
         $params = $this->getURLParams();
         if ($id = $params['ID']) {
             if ($qr = QRCode::get()->byID($id)) {
-                return $this->redirect($qr->getLink(), 301);
+                return $this->redirect($qr->getLink(), 302);
             }
         }
         return $this->redirectBack();
     }
-
 }
