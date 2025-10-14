@@ -12,7 +12,8 @@ use function imagecopyresampled, imagecreatefrompng, imagesx, imagesy, is_file, 
  * @package XD\QRCodeGenerator\Image
  * @property LogoOptions $options
  */
-class QRImageWithLogo extends QRImage{
+class QRImageWithLogo extends QRImage
+{
 
     /**
      * @param string|null $file
@@ -21,20 +22,21 @@ class QRImageWithLogo extends QRImage{
      * @return string
      * @throws \chillerlan\QRCode\Output\QRCodeOutputException
      */
-    public function dump(string $file = null, string $logo = null):string{
+    public function dump(string $file = null, string $logo = null): string
+    {
         // set returnResource to true to skip further processing for now
         $this->options->returnResource = true;
 
         // of course you could accept other formats too (such as resource or Imagick)
         // i'm not checking for the file type either for simplicity reasons (assuming PNG)
-        if(!is_file($logo) || !is_readable($logo)){
+        if (!is_file($logo) || !is_readable($logo)) {
             throw new QRCodeOutputException('invalid logo');
         }
 
         $this->matrix->setLogoSpace(
             $this->options->logoSpaceWidth,
             $this->options->logoSpaceHeight
-        // not utilizing the position here
+            // not utilizing the position here
         );
 
         // there's no need to save the result of dump() into $this->image here
@@ -62,15 +64,14 @@ class QRImageWithLogo extends QRImage{
 
         $imageData = $this->dumpImage();
 
-        if($file !== null){
+        if ($file !== null) {
             $this->saveToFile($imageData, $file);
         }
 
-        if($this->options->imageBase64){
-            $imageData = 'data:image/'.$this->options->outputType.';base64,'.base64_encode($imageData);
+        if ($this->options->imageBase64) {
+            $imageData = 'data:image/' . $this->options->outputType . ';base64,' . base64_encode($imageData);
         }
 
         return $imageData;
     }
-
 }

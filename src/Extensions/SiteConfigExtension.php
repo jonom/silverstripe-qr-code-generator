@@ -6,7 +6,7 @@ use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\SiteConfig\SiteConfig;
 
 /**
@@ -15,7 +15,8 @@ use SilverStripe\SiteConfig\SiteConfig;
  * @property SiteConfig|SiteConfigExtension $owner
  * @method Image QRCodeLogo
  */
-class SiteConfigExtension extends DataExtension{
+class SiteConfigExtension extends Extension
+{
 
     private static $db = [
         'QRCodeShowLogo' => 'Boolean',
@@ -31,18 +32,12 @@ class SiteConfigExtension extends DataExtension{
 
     public function updateCMSFields(FieldList $fields)
     {
-        parent::updateCMSFields($fields);
-
         $fields->addFieldsToTab(
             'Root.QrCodeSettings',
             [
-                CheckboxField::create('QRCodeShowLogo',_t(__CLASS__.'.QRCodeShowLogo','Show QR Code with logo')),
-                UploadField::create('QRCodeLogo',_t(__CLASS__.'.QRCodeLogo','QRCode logo'))
+                CheckboxField::create('QRCodeShowLogo', _t(__CLASS__ . '.QRCodeShowLogo', 'Show QR Code with logo')),
+                UploadField::create('QRCodeLogo', _t(__CLASS__ . '.QRCodeLogo', 'QRCode logo'))
             ]
         );
-
-
-
     }
-
 }

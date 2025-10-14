@@ -9,7 +9,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\SiteConfig\SiteConfig;
 use XD\QRCodeGenerator\Image\QRImageWithLogo;
 use XD\QRCodeGenerator\Options\LogoOptions;
@@ -19,7 +19,8 @@ use XD\QRCodeGenerator\Options\LogoOptions;
  * @package XD\QRCodeGenerator
  * @property SiteTree|SiteTreeExtension $owner
  */
-class SiteTreeExtension extends DataExtension{
+class SiteTreeExtension extends Extension
+{
 
     private static $has_one = [
         'QRCode' => 'Image'
@@ -35,17 +36,18 @@ class SiteTreeExtension extends DataExtension{
 
         $link = $this->generateQRCode();
 
-        $fields->addFieldsToTab('Root.QRCode',[
-            LiteralField::create('QRCode', '<img src="'. $link .'" alt="QR Code" width="500" height="500"><p style="padding-left:3rem;"><a href="' . $this->owner->AbsoluteLink() . '" target="_blank">' . $this->owner->AbsoluteLink() .'</a></p>')
+        $fields->addFieldsToTab('Root.QRCode', [
+            LiteralField::create('QRCode', '<img src="' . $link . '" alt="QR Code" width="500" height="500"><p style="padding-left:3rem;"><a href="' . $this->owner->AbsoluteLink() . '" target="_blank">' . $this->owner->AbsoluteLink() . '</a></p>')
         ]);
     }
 
-    public function generateQRCode(){
+    public function generateQRCode()
+    {
         // See: https://www.twilio.com/blog/create-qr-code-in-php
         $config = SiteConfig::get()->first();
         /* @var Image $logo */
         $logo = $config->QRCodeLogo();
-        if( $config->QRCodeShowLogo && $logo->exists() ){
+        if ($config->QRCodeShowLogo && $logo->exists()) {
             $options = new LogoOptions(
                 [
                     'eccLevel' => QRCode::ECC_H,
@@ -83,7 +85,5 @@ class SiteTreeExtension extends DataExtension{
 
             return (new QRCode($options))->render($this->owner->AbsoluteLink());
         }
-
     }
-
 }

@@ -26,5 +26,4 @@ class QRCodeController extends Controller
         }
         return $this->redirectBack();
     }
-
 }

@@ -10,7 +10,8 @@
   ],
   "license": "BSD-3-Clause",
   "require": {
-    "chillerlan/php-qrcode": "^3.4"
+    "chillerlan/php-qrcode": "^3.4",
+    "silverstripe/framework": "^6"
   },
   "autoload": {
     "psr-4": {

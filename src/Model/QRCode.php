@@ -68,7 +68,7 @@ class QRCode extends DataObject
 
     public function getQRLink()
     {
-        return Controller::join_links(Director::absoluteBaseURL(),'qr/' . $this->ID);
+        return Controller::join_links(Director::absoluteBaseURL(), 'qr/' . $this->ID);
     }
 
     public function getLink()
@@ -124,7 +124,6 @@ class QRCode extends DataObject
         fclose($fp);
         unlink($tmp);
         exit;
-
     }
 
     /**
@@ -202,7 +201,6 @@ class QRCode extends DataObject
 
             return (new \chillerlan\QRCode\QRCode($options))->render($this->getQRLink(), $file);
         }
-
     }
 
     public function onBeforeWrite()
@@ -215,5 +213,4 @@ class QRCode extends DataObject
             }
         }
     }
-
 }
